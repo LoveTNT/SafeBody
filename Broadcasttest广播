@@ -1,0 +1,44 @@
+public class MainActivity extends Activity {
+	
+	
+	@Override 
+	  protected void onCreate(Bundle savedInstanceState) { 
+	    super.onCreate(savedInstanceState); 
+	    setContentView(R.layout.activity_main); 
+	    Button button = (Button) findViewById(R.id.button); 
+	    button.setOnClickListener(new OnClickListener() { 
+	      @Override 
+	      public void onClick(View v) { 
+	        Intent intent = new Intent("com.example.broadcasttest.MY_BROADCAST"); 
+	        sendBroadcast(intent);
+	      } 
+	    });
+	}
+}
+
+----------------------
+package com.example.testtwo;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.widget.Toast;
+
+public class BootCompleteReceiver extends BroadcastReceiver {
+
+	@Override
+	public void onReceive(Context context, Intent intent) {
+
+		Toast.makeText(context, "received in MyBroadcastReceiver", 
+				Toast.LENGTH_SHORT).show(); 
+	}
+
+}
+
+
+  
+        <receiver android:name="com.example.testtwo.BootCompleteReceiver">
+         <intent-filter >
+             <action android:name="com.example.broadcasttest.MY_BROADCAST"/>
+         </intent-filter>        
+        </receiver>
