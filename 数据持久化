@@ -1,0 +1,42 @@
+ 数据持久化
+
+  持久化技术
+  ，持久化技术则是提供了一种机制可以让数据在瞬时状
+态和持久状态之间进行转换。
+
+Android 系统中主要提供了三种方式用于简单地实现数据持久化功能即
+	文件存储
+	SharedPreference存储
+	及数据库存储。
+
+
+除了这三种方式之外，你还可
+以将数据保存在手机的 SD 卡中，不过使用文件、SharedPreference 或数据库来保存数据会相
+对更简单一些，而且比起将数据保存在 SD 卡中会更加的安全。
+
+
+sp-------键值对的方式来存储数据的
+
+样在读取数据的时候就可
+以通过这个键把相应的值取出来。而且 SharedPreferences 还支持多种不同的数据类型存储，
+如果存储的数据类型是整型，那么读取出来的数据也是整型的，存储的数据是一个字符串，
+读取出来的数据仍然是字符串。
+
+
+Context 类中的 getSharedPreferences()方法 
+Activity 类中的 getPreferences()方法 
+SharedPreferences 对象之后，就可以开始向 SharedPreferences 文件中存储数据了，
+主要可以分为三步实现。 
+1.  调用 SharedPreferences 对象的 edit()方法来获取一个 SharedPreferences.Editor 对象。 
+2.  向 SharedPreferences.Editor 对象中添加数据，比如添加一个布尔型数据就使用
+putBoolean 方法，添加一个字符串则使用 putString()方法，以此类推。 
+3.  调用 commit()方法将添加的数据提交，从而完成数据存储操作。 
+
+
+
+
+ 
+
+
+
+
