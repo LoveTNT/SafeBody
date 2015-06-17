@@ -1,0 +1,67 @@
+git ---
+
+
+Git 是一个开源的分布式版本控制工具
+开发者就是鼎鼎大名的 Linux 操作系统的
+作者 Linus Torvalds
+
+ 创建代码仓库 
+
+  Git 的各种命令才是你应该掌握的核心技能
+
+
+ Git Bash 
+
+git config --global user.name "Tony" 
+git config --global user.email "github@TNT.com"
+
+仓库（Repository）
+，仓库（Repository）是用于保存版本管理所需信
+息的地方，所有本地提交的代码都会被提交到代码仓库中，如果有需要还可以再推送到远程
+仓库中
+
+个目录下面输入如下命令： git init
+很简单吧！只需要一行命令就可以完成创建代码仓库的操作，如图
+
+
+仓库创建完成后，会在BroadcastBestPractice项目的根目录下生成一个隐藏的.git文件夹，
+这个文件夹就是用来记录本地所有的 Git 操作的，可以通过 ls -al 命令来查看一下
+
+ls -al
+
+
+提交本地代码
+
+add 是用于把想要提交的代码先添加进来
+commit 则是真正地去执行提交操作。
+
+比如我们想添加 AndroidManifest.xml 文件，就可以输入如下命令： 
+git add AndroidManifest.xml
+
+实只需要在 add 后面加上
+目录名就可以了。比如将整个 src 目录下的所有文件都进行添加，就可以输入如下命令： 
+git add src 
+
+添加所有 git add .   ---------------------------
+
+git commit -m "First commit." 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
