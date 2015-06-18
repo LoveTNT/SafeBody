@@ -224,7 +224,36 @@ query()方法后会返回一个 Cursor 对象，查询到的所有数据都将�
 
 
 
+SQLite 使用事物
 
+升级数据库的最佳写法 
+
+
+  @Override 
+  public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { 
+    switch (oldVersion) { 
+    case 1: 
+      db.execSQL(CREATE_CATEGORY); 
+    default: 
+    } 
+  } 
+ 
+} 
+可以看到，在 onCreate()方法里我们新增了一条建表语句，然后又在 onUpgrade()方法中
+添加了一个 switch 判断，如果用户当前数据库的版本号是 1，就只会创建一张 Category 表。
+这样当用户是直接安装的第二版的程序时，就会将两张表一起创建。而当用户是使用第二版
+的程序覆盖安装第一版的程序时，就会进入到升级数据库的操作中，此时由于 Book 表已经
+存在了，因此只需要创建一张 Category 表即可。
+ @Override 
+  public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { 
+    switch (oldVersion) { 
+    case 1: 
+      db.execSQL(CREATE_CATEGORY); 
+    case 2: 
+      db.execSQL("alter table Book add column category_id integer"); 
+    default: 
+    } 
+  } 
 
 
 
