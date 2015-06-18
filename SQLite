@@ -120,6 +120,113 @@ adb 是 Android SDK 中自带的一个调试工具，使用这个工具可以直
 
 
 
+--------------------------------------------------------------------------------------------------------------------
+SQLite数据库存储
+
+SQLiteOpenHelper 帮
+助类，借助这个类就可以非常简单地对数据库进行创建和升级
+
+
+ SQLiteOpenHelper 的基本用法进行介绍
+
+
+
+ SQLiteOpenHelper 是一个抽象类
+
+SQLiteOpenHelper 中有
+两个抽象方法，分别是
+     onCreate()和
+     onUpgrade()
+后分别在这两
+个方法中去实现创建、升级数据库的逻辑。
+
+
+SQLiteOpenHelper 中 还 有 两 个 非 常 重 要 的 实 例 方 法 ， getReadableDatabase() 和
+getWritableDatabase()。
+
+
+
+SQLiteOpenHelper 中有两个构造方法可供重写，一般使用参数少一点的那个构造方法即
+可。这个构造方法中接收四个参数，第一个参数是 Context，这个没什么好说的，必须要有
+它才能对数据库进行操作。第二个参数是数据库名，创建数据库时使用的就是这里指定的名
+称。第三个参数允许我们在查询数据的时候返回一个自定义的 Cursor，一般都是传入 null。
+第 四 个 参 数 表 示 当 前 数 据 库 的 版 本 号 
+
+
+
+数据库文件会存放在/data/data/<package  name>/databases/目录下
+
+adb 是 Android SDK 中自带的一个调试工具，使用这个工具可以直接对连接在电脑上的
+手机或模拟器进行调试操作。它存放在 sdk 的 platform-tools 目录下
+
+是 Windows 系统，可以右击我的电脑→属性→高级→环境变量，然后在
+系统变量里找到 Path 并点击编辑，将 platform-tools 目录配置进去
+
+ cd 命令进行到/data/data/com.example.databasetest/databases/目录下，并使用 ls
+命令查看到该目录里的文件
+ sqlite 命令来打开数据库了，只需要键入 sqlite3，后面加上数据库
+名即可，
+
+
+升级数据库
+onUpgrade()
+方法是用于对数据库进行升级的，它在整个数据库的管理工作当中起着非常重要的作用
+
+
+
+
+
+先将程序卸载掉，然后重新运行，这时
+BookStore.db 数据库已经不存在了
+SQLiteOpenHelper 的升级功能就可以很轻松地解决这个问题。修改 MyDatabaseHelper
+中的代码，如下所示： 
+public class MyDatabaseHelper extends SQLiteOpenHelper { 
+  …… 
+  @Override 
+  public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { 
+    db.execSQL("drop table if exists Book"); 
+    db.execSQL("drop table if exists Category"); 
+    onCreate(db); 
+  } 
+
+  如果发现数据库中已经
+存在 Book 表或 Category 表了，就将这两张表删除掉，然后再调用 onCreate()方法去重新创
+建。这里先将已经存在的表删除掉，
+
+要传入一个比 1 大的数，就可以让 onUpgrade()方法得到执行
+ dbHelper = new MyDatabaseHelper(this, "BookStore.db", null, 2); 
+
+ 添加数据 
+
+SQLiteDatabase 中提供了一个 insert()方法
+。它接收三个
+参数，第一个参数是表名，我们希望向哪张表里添加数据，这里就传入该表的名字。第二个
+参数用于在未指定添加数据的情况下给某些可为空的列自动赋值 NULL，一般我们用不到这
+个功能，直接传入 null 即可。第三个参数是一个 ContentValues 对象，它提供了一系列的 put()
+方法重载，用于向 ContentValues 中添加数据
+
+
+query()方法参数  对应 SQL 部分  描述 
+table  from table_name  指定查询的表名 
+columns  select column1, column2  指定查询的列名 
+selection  where column = value  指定 where 的约束条件 
+selectionArgs  -  为 where 中的占位符提供具体的值 
+groupBy  group by column  指定需要 group by 的列 
+having  having column = value  对 group by 后的结果进一步约束 
+orderBy  order by column1, column2  指定查询结果的排序方式 
+
+。调用
+query()方法后会返回一个 Cursor 对象，查询到的所有数据都将从这个对象中取出
+
+  使用 SQL 操作数据库 
+
+
+
+
+
+
+
+
 
 
 
