@@ -1,0 +1,54 @@
+多媒体使用通知
+
+通知（Notification）
+
+ 通知的基本用法。通知的用法还是比较
+灵活的，既可以在活动里创建，也可以在广播接收器里创建，当然还可以在下一章中我们即
+将学习的服务里创建。相比于广播接收器和服务，在活动里创建通知的场景还是比较少的，
+因为一般只有当程序进入到后台的时候我们才需要使用通知。 
+
+
+详细步骤
+
+首先需要一个 NotificationManager 来对通知进行管理，可以调用 Context 的
+getSystemService()方法获取到。getSystemService()方法接收一个字符串参数用于确定获取系
+统的哪个服务，这里我们传入 Context.NOTIFICATION_SERVICE 即可。
+NotificationManager 的实例就可以写成： 
+NotificationManager manager = (NotificationManager)  
+ 
+getSystemService(Context.NOTIFICATION_SERVICE); 
+
+。Notification 的有参构造函数接收三个参数，第一个
+参数用于指定通知的图标，比如项目的 res/drawable 目录下有一张 icon.png 图片，那么这里
+就可以传入 R.drawable.icon。第二个参数用于指定通知的 ticker 内容，当通知刚被创建的时
+候，它会在系统的状态栏一闪而过，属于一种瞬时的提示信息。第三个参数用于指定通知被
+创建的时间，以毫秒为单位，当下拉系统状态栏时，这里指定的时间会显示在相应的通知上。
+
+
+ Notification 对象就可以写成： 
+Notification notification = new Notification(R.drawable.icon, "This is ticker text", 
+                  System.currentTimeMillis());
+
+
+
+                  Notification 对象后，我们还需要对通知的布局进行设定，这里只需要调用
+Notification 的 setLatestEventInfo()方法就可以给通知设置一个标准的布局。
+
+个参数，第一个参数是 Context，这个没什么好解释的。第二个参数用于指定通知的标题内
+容，下拉系统状态栏就可以看到这部分内容。第三个参数用于指定通知的正文内容，同样下
+拉系统状态栏就可以看到这部分内容。第四个参数我们暂时还用不到，可以先传入 null
+
+
+工作都完成之后，只需要调用 NotificationManager 的 notify()方法就可以让通知显示
+出来了。notify()方法接收两个参数，第一个参数是 id，要保证为每个通知所指定的 id 都是
+不同的。第二个参数则是 Notification 对象，这里直接将我们刚刚创建好的 Notification 对象
+传入即可。因此，显示一个通知就可以写成： 
+manager.notify(1, notification)
+
+
+
+
+
+
+
+
