@@ -1,0 +1,293 @@
+服务
+
+服务（Service）是 Android 中实现程序后台运行的解决方案，它非常适合用于去执行那
+些不需要和用户交互而且还要求长期运行的任务。服务的运行不依赖于任何用户界面，即使
+当程序被切换到后台，或者用户打开了另外一个应用程序，服务仍然能够保持正常运行
+
+不过需要注意的是，服务并不是运行在一个独立的进程当中的，而是依赖于创建服务
+时所在的应用程序进程。当某个应用程序进程被杀掉时，所有依赖于该进程的服务也会停
+止运行。 
+
+不要被服务的后台概念所迷惑，实际上服务并不会自动开启线程，所有的代码
+都是默认运行在主线程当中的。也就是说，我们需要在服务的内部手动创建子线程，并在这
+里执行具体的任务，否则就有可能出现主线程被阻塞住的情况
+
+
+
+
+
+class MyThread extends Thread{
+	
+	@override
+	public void run(){
+	   //处理具体逻辑
+	}
+}
+
+
+new MyThread().start(); 
+
+，使用继承的方式耦合性有点高，更多的时候我们都会选择使用实现 Runnable 接
+口的方式来定义一个线程，如下所示： 
+class MyThread implements Runnable { 
+   
+  @Override 
+  public void run() { 
+    // 处理具体的逻辑 
+  } 
+ 
+} 
+如果使用了这种写法，启动线程的方法也需要进行相应的改变，如下所示： 
+MyThread myThread = new MyThread(); 
+new Thread(myThread).start(); 
+
+
+
+new Thread(new Runnable() { 
+   
+  @Override 
+  public void run() { 
+    // 处理具体的逻辑 
+  } 
+   
+}).start(); 
+
+
+Android 的 UI 也是线程不安全的。也就是说，如果想要更
+新应用程序里的 UI 元素，则必须在主线程中进行，否则就会出现异常。 
+
+ 解析异步消息处理机制 
+
+
+
+Android 中的异步消息处理主要由四个部分组成，Message、Handler、MessageQueue 和
+Looper。
+
+1.  Message 
+Message 是在线程之间传递的消息，它可以在内部携带少量的信息，用于在不同线
+程之间交换数据。上一小节中我们使用到了 Message 的 what 字段，除此之外还可以使
+用 arg1 和 arg2 字段来携带一些整型数据，使用 obj 字段携带一个 Object 对象。 
+2.  Handler 
+Handler 顾名思义也就是处理者的意思，它主要是用于发送和处理消息的。发送消
+息一般是使用 Handler 的 sendMessage()方法，而发出的消息经过一系列地辗转处理后，
+最终会传递到 Handler 的 handleMessage()方法中。 
+3.  MessageQueue 
+MessageQueue 是消息队列的意思，它主要用于存放所有通过 Handler 发送的消息。
+这部分消息会一直存在于消息队列中，等待被处理。每个线程中只会有一个 MessageQueue
+对象。 
+4.  Looper 
+Looper 是每个线程中的 MessageQueue 的管家，调用 Looper 的 loop()方法后，就会
+进入到一个无限循环当中，然后每当发现 MessageQueue 中存在一条消息，就会将它取
+出，并传递到 Handler 的 handleMessage()方法中。每个线程中也只会有一个 Looper 对象。 
+了解了 Message、Handler、MessageQueue 以及 Looper 的基本概念后，我们再来对异步
+消息处理的整个流程梳理一遍。首先需要在主线程当中创建一个 Handler 对象，并重写
+handleMessage()方法。然后当子线程中需要进行 UI 操作时，就创建一个 Message 对象，并
+通过 Handler 将这条消息发送出去。之后这条消息会被添加到 MessageQueue 的队列中等待
+被处理，而 Looper 则会一直尝试从 MessageQueue 中取出待处理消息，最后分发回 Handler
+的 handleMessage()方法中。由于 Handler 是在主线程中创建的，所以此时 handleMessage()方
+法中的代码也会在主线程中运行，于是我们在这里就可以安心地进行 UI 操作了
+
+一条 Message 经过这样一个流程的辗转调用后，也就从子线程进入到了主线程，从不能
+更新 UI 变成了可以更新 UI
+
+
+
+ 使用 AsyncTask  使用 AsyncTask  使用 AsyncTask  使用 AsyncTask  使用 AsyncTask  使用 AsyncTask  使用 AsyncTask  使用 AsyncTask  使用 AsyncTask 
+
+
+
+AsyncTask 背后的实现原理也是基于异步
+消息处理机制的，只是 Android 帮我们做了很好的封装而已
+
+
+
+
+1.  Params 
+在执行 AsyncTask 时需要传入的参数，可用于在后台任务中使用
+2.  Progress 
+后台任务执行时，如果需要在界面上显示当前的进度，则使用这里指定的泛型作为
+进度单位。 
+
+3.  Result 
+当任务执行完毕后，如果需要对结果进行返回，则使用这里指定的泛型作为返回值
+类型。
+
+
+一个最简单的自定义 AsyncTask 就可以写成如下方式：  
+
+	class DownloadTask extends AsyncTask<Void, Integer, Boolean> { 
+  …… 
+} 
+
+
+
+AsyncTask 的第一个泛型参数指定为 Void，表示在执行 AsyncTask 的时候不
+需要传入参数给后台任务。第二个泛型参数指定为 Integer，表示使用整型数据来作为进度显
+示单位。第三个泛型参数指定为 Boolean，则表示使用布尔型数据来反馈执行结果
+
+
+AsyncTask重写的方法有以下四个。
+
+
+
+1.  onPreExecute() 
+
+这个方法会在后台任务开始执行之前调用，用于进行一些界面上的初始化操作，比
+如显示一个进度条对话框等。 
+
+2.  doInBackground(Params...) 
+
+这个方法中的所有代码都会在子线程中运行，我们应该在这里去处理所有的耗时任
+务。任务一旦完成就可以通过 return 语句来将任务的执行结果返回，如果 AsyncTask 的
+第三个泛型参数指定的是 Void，就可以不返回任务执行结果。注意，在这个方法中是不
+可以进行 UI 操作的，如果需要更新 UI 元素，比如说反馈当前任务的执行进度，可以调
+用 
+	----------
+	---------- publishProgress(Progress...)方法来完成。
+
+
+3.  onProgressUpdate(Progress...) 
+
+当在后台任务中调用了 publishProgress(Progress...)方法后，这个方法就会很快被调
+用，方法中携带的参数就是在后台任务中传递过来的。在这个方法中可以对 UI 进行操
+作，利用参数中的数值就可以对界面元素进行相应地更新。
+
+
+4.  onPostExecute(Result) 
+
+当后台任务执行完毕并通过 return 语句进行返回时，这个方法就很快会被调用。返
+回的数据会作为参数传递到此方法中，可以利用返回的数据来进行一些 UI 操作，比如
+说提醒任务执行的结果，以及关闭掉进度条对话框等。 
+
+
+-----------
+----- -----
+
+ AsyncTask 的诀窍就是，在 doInBackground()方法中去执行具体的耗时
+任务，在 onProgressUpdate()方法中进行 UI 操作，在 onPostExecute()方法中执行一些任务的
+
+
+
+
+定义一个服务
+
+
+public class MyService extends Service{
+	@override
+	public IBinder onBind(Intent intent){
+	return null;
+	}
+}
+
+
+处理事情的逻辑可以重写 Service 中的另外一些方法
+ onCreate()、onStartCommand()和 onDestroy()这三个方法
+
+ reate()方法会在服务创建的时候调用，
+onStartCommand()方法会在每次服务启动的时候调用，onDestroy()方法会在服务销毁的时候
+调用。
+
+如果我们希望服务一旦启动就立刻去执行某个动作，就可以将逻辑写在
+onStartCommand()方法里。而当服务销毁时，我们又应该在 onDestroy()方法中去回收那些不
+再使用的资源。
+每一个服务都需要在 AndroidManifest.xml 文件中进行注册才能生效
+
+
+
+
+  …… 
+    <application 
+        android:allowBackup="true" 
+        android:icon="@drawable/ic_launcher" 
+        android:label="@string/app_name" 
+        android:theme="@style/AppTheme" > 
+    …… 
+        <service android:name=".MyService" > 
+        </service> 
+    </application> 
+</manifest> 
+  启动和停止服务   启动和停止服务   启动和停止服务   启动和停止服务   启动和停止服务   启动和停止服务   启动和停止服务 
+
+
+
+
+
+
+ @Override 
+  public void onClick(View v) { 
+    switch (v.getId()) { 
+
+
+    case R.id.start_service: 
+
+
+
+      Intent startIntent = new Intent(this, MyService.class); 
+      startService(startIntent); // 启动服务 
+      break; 
+
+
+
+    case R.id.stop_service: 
+
+
+      Intent stopIntent = new Intent(this, MyService.class); 
+      stopService(stopIntent); // 停止服务 
+      break; 
+
+
+
+    default: 
+      break; 
+    } 
+  } 
+
+那就是 onCreate()方法和 onStartCommand()到底有什么区别呢？那就是 onCreate()方法和 onStartCommand()到底有什么区别呢？那就是 onCreate()方法和 onStartCommand()到底有什么区别呢？
+
+onCreate()方法是在服务第一次创建的时候调用的，而 onStartCommand()方法则在
+每次启动服务的时候都会调用，由于刚才我们是第一次点击 Start Service 按钮，服务此时还
+未创建过，所以两个方法都会执行，之后如果你再连续多点击几次 Start Service 按钮，你就
+会发现只有 onStartCommand()方法可以得到执行了。 
+
+
+然后 MyService 的 onCreate()和
+onStartCommand()方法就会得到执行。之后服务会一直处于运行状态，但具体运行的是什么
+逻辑，活动就控制不了了。这就类似于活动通知了服务一下：“你可以启动了！”然后服务就
+去忙自己的事情了，但活动并不知道服务到底去做了什么事情，以及完成的如何。 
+
+
+
+
+
+ 服务的生命周期 
+
+
+ onCreate()、onStartCommand()、onBind()和 onDestroy()等
+
+方法都是在服务生命周期内可能回调的方法
+
+ 服务的更多技巧 
+
+  使用前台服务 
+
+  服务的最佳实践——后台执行的定时任务 
+
+
+  Android 中的定时任务一般有两种实现方式，一种是使用 Java  API 里提供的 Timer 类，
+一种是使用 Android 的 Alarm 机制
+
+，但 Timer
+有一个明显的短板，它并不太适用于那些需要长期在后台运行的定时任务。我们都知道，为
+了能让电池更加耐用，每种手机都会有自己的休眠策略，Android 手机就会在长时间不操作
+的情况下自动让 CPU 进入到睡眠状态，这就有可能导致 Timer 中的定时任务无法正常运行。
+而 Alarm 机制则不存在这种情况，它具有唤醒 CPU 的功能，即可以保证每次需要执行定时
+任务的时候 CPU 都能正常工作。需要注意，这里唤醒 CPU 和唤醒屏幕完全不是同一个概念，
+千万不要产生混淆。 
+那么首先我们来看一下 Alarm 机制的用法吧，其实并不复杂，主要就是借助了
+AlarmManager 类来实现的。这个类和 NotificationManager 有点类似，都是通过调用 Context 的
+getSystemService()方法来获取实例的，只是这里需要传入的参数是 Context.ALARM_SERVICE。
+因此，获取一个 AlarmManager 的实例就可以写成： 
+AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE); 
+
+
+
