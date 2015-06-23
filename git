@@ -136,6 +136,80 @@ git log 2e7c0547af28cc1e9f303a4a1126fddbb704281b -1 –p
 
 
 
+git  Git 的高级用法。 
+git init 
+git add . 
+git commit -m "first commit."
+
+
+
+ 分支的用法 
+
+ 分支是版本控制工具中比较高级且比较重要的一个概念，它主要的作用就是在现有代码
+的基础上开辟一个分叉口，使得代码可以在主干线和分支线上同时进行开发，且相互之间不
+会影响。
+
+Git 中操作分支吧。 
+分支的英文名是 branch，如果想要查看当前的版本库当中有哪些分支，可以使用 git 
+branch –a 这个命令
+
+
+$ git branch -a;
+
+
+git branch version1.0 
+这样就创建了一个名为 version1.0 的分支，我们再次输入 git  branch  –a 这个命令来检查
+一下，结果如图 11.18 所示。 
+
+
+可以看到，果然有一个叫作 version1.0 的分支出现了。你会发现，master 分支的前面有
+一个*号，说明目前我们的代码还是在 master 分支上的，那么怎样才能切换到 version1.0 这
+个分支上呢？其实也很简单，只需要使用 checkout 命令即可，如下所示： 
+git checkout version1.0 
+再次输入 git branch –a 来进行检查，
+
+
+最好的办法就是使用 merge命令来完成合并操作
+
+git checkout master 
+git merge version1.0 
+
+
+最后，当我们不再需要 version1.0 这个分支的时候，可以使用如下命令将这个分支删除掉： 
+git branch -D version1.0 
+
+那么如何使用 Git 来进行团队合作开发呢？这就需要有一个远程的版本库，团队的每个
+成员都从这个版本库中获取到最原始的代码，
+
+比如说现在有一个远程版本库的 Git 地址是 https://github.com/exmaple/test.git，就可以使
+用如下的命令将代码下载到本地： 
+git clone https://github.com/exmaple/test.git 
+之后你在这份代码的基础进行了一些修改和提交，那么怎样才能把本地修改的内容同步
+到远程版本库上呢？这就需要借助 push 命令来完成了，用法如下所示： 
+git push origin master 
+git clone https://github.com/exmaple/test.git 
+之后你在这份代码的基础进行了一些修改和提交，那么怎样才能把本地修改的内容同步
+到远程版本库上呢？这就需要借助 push 命令来完成了，用法如下所示： 
+git push origin master 
+其中 origin 部分指定的是远程版本库的 Git 地址，master 部分指定的是同步到哪一个分
+支上，上述命令就完成了将本地代码同步到 https://github.com/exmaple/test.git 这个版本库的
+master 分支上的功能。 
+知道了将本地的修改同步到远程版本库上的方法，接下来我们看一下如何将远程版本库
+上的修改同步到本地。Git 提供了两种命令来完成此功能，分别是 fetch 和 pull，fetch 的语法
+规则和 push 是差不多的，如下所示： 
+git fetch origin master 
+执行这个命令后，就会将远程版本库上的代码同步到本地，不过同步下来的代码并不会
+合并到任何分支上去，而是会存放在到一个 origin/master 分支上，这时我们可以通过 diff 命
+令来查看远程版本库上到底修改了哪些东西： 
+git diff origin/master 
+之后再调用 merge 命令将 origin/master 分支上的修改合并到主分支上即可，如下所示： 
+git merge origin/master 
+而 pull 命令则是相当于将 fetch 和 merge 这两个命令放在一起执行了，它可以从远程版
+本库上获取最新的代码并且合并到本地，用法如下所示： 
+git pull origin master 
+也许你现在对远程版本库的使用还会感觉比较抽象，没关系，因为暂时我们只是了解了
+一下命令的用法，还没进行实践，在第 14 章当中，你将会对远程版本库的用法有更深一层
+的认识。 
 
 
 
