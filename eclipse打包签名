@@ -1,0 +1,26 @@
+打包
+
+1 android tools --export singed application package
+
+2 browse
+
+3  location ---选择要使用的keystore  
+	新建 create new  keystore
+4  next   
+    
+    alias  私钥别名
+    password
+    congig 密码确认
+    validity 设置有效期（推荐25年）
+    first and last name 应用开发者姓名
+    orgnizationl Unit 开发者株洲单位名称
+    organization 	开发者组织名称
+
+    1
+    1
+    1
+    1
+
+
+   5
+   finish
